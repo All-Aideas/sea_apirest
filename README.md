@@ -2,6 +2,7 @@
  API REST service to invoke Natural language processing (NLP) model text-to-text.
 
 ## Installation
+### WINDOWS
 #### Database variables
 ```sh
 set DATABASE_USER=<USER_NAME>
@@ -14,6 +15,27 @@ set DATABASE_NAME=<DATABASE_NAME>
 ```sh
 set MODEL_CHECKPOINT=<MODEL_CHCKPOINT_NAME>
 set MODEL_SAVE_NAME=<MODEL_FILE_NAME>
+```
+
+### LINUX
+#### Database variables
+```sh
+export DATABASE_USER=<USER_NAME>
+export DATABASE_PASSWORD=<USER_PASSWORD>
+export DATABASE_HOST=<DATABASE_HOSTNAME>
+export DATABASE_NAME=<DATABASE_NAME>
+```
+
+#### Model variables
+```sh
+export MODEL_CHECKPOINT=<MODEL_CHCKPOINT_NAME>
+export MODEL_SAVE_NAME=<MODEL_FILE_NAME>
+```
+
+## Run API
+```sh
+cd sea_apirest/
+python3 app.py
 ```
 
 ## Development
