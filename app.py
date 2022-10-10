@@ -45,7 +45,7 @@ def predict():
         else:
             t = time.time() # get execution time
 
-            input_ids = tokenizer('translate Spanish to Signs: ' + mensaje, return_tensors='pt').input_ids
+            input_ids = tokenizer(mensaje, return_tensors='pt').input_ids
             outputs = model.generate(input_ids, max_length=512)
             outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
             
