@@ -54,7 +54,16 @@ pip install -r requirements.txt
 ```
 
 ## Testing from localhost
-Example to invoke API REST.
+Example to invoke API REST from CMD.
 ```sh
 curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d "{\"message\":\"Yo estoy jugando ajedrez.\"}"
+```
+
+Example to invoke API REST using JavaScript.
+```sh
+fetch('http://localhost:5000/predict', {
+  method: "POST",
+  headers: {"Content-type": "application/json;charset=UTF-8"},
+  body:JSON.stringify({"message":"Yo estoy jugando ajedrez."})
+}).then(response => response.json()).then(json => console.log(json)).catch(err => console.log(err));
 ```
