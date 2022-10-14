@@ -1,9 +1,9 @@
 import time
 import os
 import torch
-from transformers import AutoTokenizer
-from transformers import AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from connectdb import ConnectDB
 
 print('Libraries imported.')
@@ -22,11 +22,19 @@ print('Model loaded.')
 
 app = Flask(__name__)
 
+api_cors_config = {
+    "origins": "*",
+    "methods": ["GET","POST"],
+    "allow_headers": "*"
+}
+
+CORS(app, resources={r"/*": api_cors_config})
+
 cnx = ConnectDB()
 print('Database loaded.')
 
-@app.route("/")
-def hello():
+@app.route("/docs", methods=['GET'])
+def docs():
     return "Predecir frase."
 
 @app.route('/predict', methods=['POST'])
@@ -35,14 +43,15 @@ def predict():
     print(data)
     json_output = dict()
     try:
-        mensaje = data['message']
-        print("Predecir frase: %s" % (mensaje),)
-        
-        if not mensaje:
-            json_output = {'response': 'El campo message es requerido.',
-                            'api_response': {'code': 400, 'message': 'Bad Request'}
+        if not data or 'message' not in data:
+            json_output_code = 400
+            json_output = {'response': 'El campo \'message\' es requerido.',
+                            'api_response': {'code': json_output_code, 'message': 'Bad Request'}
                         }
         else:
+            mensaje = data['message']
+            print("Predecir frase: %s" % (mensaje),)
+            
             t = time.time() # get execution time
 
             input_ids = tokenizer(mensaje, return_tensors='pt').input_ids
@@ -53,14 +62,28 @@ def predict():
             print("Execution time: %0.02f seconds" % (dt))
             cnx.add_frase(dt, mensaje, outputs)
             
+            json_output_code = 200
             json_output = {'response': outputs,
-                            'api_response': {'code': 200, 'message': 'OK'}
+                            'api_response': {'code': json_output_code, 'message': 'OK'}
                         }
     except:
+        json_output_code = 500
         json_output = {'response': 'Ha ocurrido un error.',
-                            'api_response': {'code': 500, 'message': 'Internal Server Error'}
+                            'api_response': {'code': json_output_code, 'message': 'Internal Server Error'}
                         }
-    return jsonify(json_output)
+    return jsonify(json_output), json_output_code
+
+@app.errorhandler(404)
+def handler_404(e):
+    json_output_code = 404
+    return jsonify({'response': 'Pagina no encontrada.',
+                    'api_response': {'code': json_output_code, 'message': 'Page not found'}}), json_output_code
+
+@app.errorhandler(405)
+def handler_405(e):
+    json_output_code = 405
+    return jsonify({'response': 'The method is not allowed for the requested URL.',
+                    'api_response': {'code': json_output_code, 'message': 'Method Not Allowed'}}), json_output_code
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
