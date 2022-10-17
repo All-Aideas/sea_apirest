@@ -43,35 +43,43 @@ def predict():
     print(data)
     json_output = dict()
     try:
-        if request.args.get('api_key') is None:
+        headers = request.headers
+        if headers.get("X-Api-Key") is None:
             json_output_code = 401
-            json_output = {'response': 'El campo \'api_key\' es requerido.',
+            json_output = {'response': 'Ud. no se encuentra autorizado para ejecutar esta operación.',
                             'api_response': {'code': json_output_code, 'message': 'Unauthorized'}
                         }
         else:
-            if not data or 'message' not in data:
-                json_output_code = 400
-                json_output = {'response': 'El campo \'message\' es requerido.',
-                                'api_response': {'code': json_output_code, 'message': 'Bad Request'}
+            auth = headers.get("X-Api-Key")
+            if auth != os.environ['API_KEY_SEA']:
+                json_output_code = 401
+                json_output = {'response': 'Token no válido.',
+                                'api_response': {'code': json_output_code, 'message': 'Invalid Token'}
                             }
             else:
-                mensaje = data['message']
-                print("Predecir frase: %s" % (mensaje),)
-                
-                t = time.time() # get execution time
+                if not data or 'message' not in data:
+                    json_output_code = 400
+                    json_output = {'response': 'El campo \'message\' es requerido.',
+                                    'api_response': {'code': json_output_code, 'message': 'Bad Request'}
+                                }
+                else:
+                    mensaje = data['message']
+                    print("Predecir frase: %s" % (mensaje),)
+                    
+                    t = time.time() # get execution time
 
-                input_ids = tokenizer(mensaje, return_tensors='pt').input_ids
-                outputs = model.generate(input_ids, max_length=512)
-                outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-                
-                dt = time.time() - t
-                print("Execution time: %0.02f seconds" % (dt))
-                cnx.add_frase(dt, mensaje, outputs)
-                
-                json_output_code = 200
-                json_output = {'response': outputs,
-                                'api_response': {'code': json_output_code, 'message': 'OK'}
-                            }
+                    input_ids = tokenizer(mensaje, return_tensors='pt').input_ids
+                    outputs = model.generate(input_ids, max_length=512)
+                    outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+                    
+                    dt = time.time() - t
+                    print("Execution time: %0.02f seconds" % (dt))
+                    cnx.add_frase(dt, mensaje, outputs)
+                    
+                    json_output_code = 200
+                    json_output = {'response': outputs,
+                                    'api_response': {'code': json_output_code, 'message': 'OK'}
+                                }
     except:
         json_output_code = 500
         json_output = {'response': 'Ha ocurrido un error.',
