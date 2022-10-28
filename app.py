@@ -72,15 +72,18 @@ def predict():
                     outputs = model.generate(input_ids, max_length=512)
                     outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
                     
-                    dt = time.time() - t
-                    print("Execution time: %0.02f seconds" % (dt))
-                    cnx.add_frase(dt, mensaje, outputs)
+                    dt = float("%0.06f" % (time.time() - t))
+                    print("Execution time: %0.06f seconds" % (dt))
+                    remote_addr = request.remote_addr
+                    user_agent = obtener_header(headers)
+                    cnx.add_frase(dt, remote_addr, user_agent, mensaje, outputs)
                     
                     json_output_code = 200
                     json_output = {'response': outputs,
                                     'api_response': {'code': json_output_code, 'message': 'OK'}
                                 }
-    except:
+    except Exception as e:
+        print(e)
         json_output_code = 500
         json_output = {'response': 'Ha ocurrido un error.',
                             'api_response': {'code': json_output_code, 'message': 'Internal Server Error'}
@@ -98,6 +101,13 @@ def handler_405(e):
     json_output_code = 405
     return jsonify({'response': 'The method is not allowed for the requested URL.',
                     'api_response': {'code': json_output_code, 'message': 'Method Not Allowed'}}), json_output_code
+
+def obtener_header(request_headers):
+    user_agent = None
+    if 'User-Agent' in request_headers:
+        user_agent = request_headers['User-Agent']
+    
+    return user_agent
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
