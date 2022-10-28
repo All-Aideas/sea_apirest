@@ -20,9 +20,9 @@ class ConnectDB:
 
     def add_frase(self, tiemporespuesta, fraseinput, fraseoutput):
         add_frase_predict = ("INSERT INTO log_predict "
-                    "(tiemporespuesta, fraseinput, fraseoutput) "
-                    "VALUES (%s, %s, %s)")
-        data_frase_predict = (tiemporespuesta, fraseinput, fraseoutput)
+                    "(tiemporespuesta, fraseinput, fraseoutput, origin, useragent) "
+                    "VALUES (%s, %s, %s, %s, %s)")
+        data_frase_predict = (tiemporespuesta, fraseinput, fraseoutput, remote_addr, user_agent)
         cursor = self.cnx.cursor()
         cursor.execute(add_frase_predict, data_frase_predict)
         id_frase_predict = cursor.lastrowid
