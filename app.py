@@ -59,7 +59,8 @@ def predict():
             json_output = {'response': outputs,
                             'api_response': {'code': 200, 'message': 'OK'}
                         }
-    except:
+    except Exception as e:
+        print(e)
         json_output = {'response': 'Ha ocurrido un error.',
                             'api_response': {'code': 500, 'message': 'Internal Server Error'}
                         }
