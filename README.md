@@ -77,3 +77,12 @@ fetch('http://localhost:5000/predict', {
   body:JSON.stringify({"message":"Yo estoy jugando ajedrez."})
 }).then(response => response.json()).then(json => console.log(json)).catch(err => console.log(err));
 ```
+
+Example to invoke API REST using JavaScript.
+```sh
+fetch('http://localhost:5000/predict', {
+  method: "POST",
+  headers: {"Content-type": "application/json;charset=UTF-8", "X-Api-Key": <API_KEY_SEA>},
+  body:JSON.stringify({"message":"Yo estoy jugando ajedrez."})
+}).then(response => response.json()).then(json => console.log(json)).catch(err => console.log(err));
+```
