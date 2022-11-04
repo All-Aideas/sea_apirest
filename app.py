@@ -109,5 +109,12 @@ def obtener_header(request_headers):
     
     return user_agent
 
+def obtener_header(request_headers):
+    user_agent = None
+    if 'User-Agent' in request_headers:
+        user_agent = request_headers['User-Agent']
+    
+    return user_agent
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
