@@ -128,7 +128,7 @@ def download_database():
     return send_file(
         return_data,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        attachment_filename=attachment_filename,
+        download_name=attachment_filename,
         as_attachment=True,
     )
 
